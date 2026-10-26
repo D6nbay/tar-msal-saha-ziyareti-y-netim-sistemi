@@ -1,5 +1,6 @@
 using SahaZiyaret.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using SahaZiyaret.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<SahaZiyaretDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<FarmerService>();
 
 var app = builder.Build();
 
