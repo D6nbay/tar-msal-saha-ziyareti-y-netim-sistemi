@@ -86,4 +86,22 @@ public class FarmerService
         PageSize = pageSize
     };
 }
+
+    /* Verilen id deki çiftçinin bilgilerini istemciden gelen değerlerle günceller, çiftçi bulunamazsa false güncellendiyse true döndürür. */
+    public async Task<bool> UpdateAsync(int id, FarmerRequest request)
+    {
+        var farmer = await _context.Farmers.FindAsync(id);
+        if (farmer == null)
+        {
+            return false;
+        }
+        farmer.FullName = request.FullName;
+        farmer.NationalId = request.NationalId;
+        farmer.PhoneNumber = request.PhoneNumber;
+        farmer.Region = request.Region;
+        farmer.District = request.District;
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }

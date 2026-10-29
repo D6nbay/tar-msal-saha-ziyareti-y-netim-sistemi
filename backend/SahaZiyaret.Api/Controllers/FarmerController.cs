@@ -45,4 +45,17 @@ public class FarmersController : ControllerBase//ControllerBase, HTTP cevabı ü
         var created = await _service.CreateAsync(request);
         return CreatedAtAction(nameof(GetById), new { id = created.Id}, created);
     }
+
+
+    /* put api/Farmers/{id}: Çiftçiyi günceller. Başarılıysa 204 No Content, kayıt yoksa 404 döner. */
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, FarmerRequest request)
+    {
+        var updated = await _service.UpdateAsync(id, request);
+        if (!updated)
+        {
+        return NotFound();
+        }
+        return NoContent();
+    }
 }
