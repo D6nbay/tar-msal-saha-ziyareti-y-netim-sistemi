@@ -10,4 +10,6 @@ public class SahaZiyaretDbContext : DbContext
     }
 
     public DbSet<Farmer> Farmers { get; set; } = null!;
+
+    public DbSet<FarmVisit> FarmVisits { get; set; } = null!;
 }
