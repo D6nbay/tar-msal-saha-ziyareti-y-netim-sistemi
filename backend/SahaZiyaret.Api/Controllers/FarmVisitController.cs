@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SahaZiyaret.Api.Dtos;
 using SahaZiyaret.Api.Services;
+using SahaZiyaret.Api.Domain.Enums;
 
 namespace SahaZiyaret.Api.Controllers;
 
@@ -39,5 +40,15 @@ public class FarmVisitsController : ControllerBase
             return BadRequest("Belirtilen çiftçi bulunamadı.");
         }
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
+
+    /* GET api/farm-visits: Ziyaretleri farmerId, status, startDate, endDate, page ve pageSize parametreleriyle sayfalı olarak listeler. */
+    [HttpGet]
+    public async Task<ActionResult<PagedResult<FarmVisitDto>>> GetAll(
+        int? farmerId, VisitStatus? status, DateTime? startDate, DateTime? endDate,
+        int page = 1, int pageSize = 10)
+    {   
+        var result = await _service.GetAllAsync(farmerId, status, startDate, endDate, page, pageSize);
+        return result;
     }
 }

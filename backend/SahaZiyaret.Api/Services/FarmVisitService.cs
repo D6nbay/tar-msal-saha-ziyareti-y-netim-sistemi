@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SahaZiyaret.Api.Data;
 using SahaZiyaret.Api.Domain.Entities;
 using SahaZiyaret.Api.Dtos;
+using SahaZiyaret.Api.Domain.Enums;
 
 namespace SahaZiyaret.Api.Services;
 
@@ -70,4 +71,40 @@ public class FarmVisitService
             UpdatedAt = visit.UpdatedAt
         };
     }
+
+    /* Ziyaretleri çiftçi, durum ve tarih aralığına göre filtreleyip sayfa sayfa listeler. En yeni ziyaret en üstte olacak şekilde sıralar. */
+    public async Task<PagedResult<FarmVisitDto>> GetAllAsync(int? farmerid, VisitStatus? status, 
+        DateTime? startTime, DateTime? endTime, int page, int pageSize){
+            if(page < 1) page = 1;
+            if(pageSize <= 0) pageSize = 10;
+            if(pageSize > 100) pageSize = 100;
+
+            var query = _context.FarmVisits.Include(v=> v.Farmer).AsQueryable();
+
+            if(farmerid.HasValue) query = query.Where(v=>v.FarmerId == farmerid.Value);
+
+            if (status.HasValue) query = query.Where(v => v.Status == status.Value);
+
+            if (startTime.HasValue) query = query.Where(v => v.VisitDate >= startTime.Value.Date);    
+
+            if (endTime.HasValue) query = query.Where(v => v.VisitDate < endTime.Value.Date.AddDays(1));
+
+            var totalCount = await query.CountAsync();
+
+            var visits = await query
+                .OrderByDescending(v => v.VisitDate)
+                .ThenBy(v => v.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<FarmVisitDto>
+            {
+                Items = visits.Select(ToDto).ToList(),
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
+                
+        }
 }
