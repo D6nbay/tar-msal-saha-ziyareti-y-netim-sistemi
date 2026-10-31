@@ -107,4 +107,35 @@ public class FarmVisitService
             };
                 
         }
+
+    public async Task<bool> UpdateAsync(int id, FarmVisitRequest request)
+    {
+        var visit = await _context.FarmVisits.FindAsync(id);
+        if (visit == null)
+        {
+        return false;
+        }
+        visit.VisitDate = request.VisitDate;
+        visit.VisitType = request.VisitType;
+        visit.Notes = request.Notes;
+        visit.Status = request.Status;
+        visit.NextVisitDate = request.NextVisitDate;
+        visit.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+        return true;
+    } 
+     
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var visit = await _context.FarmVisits.FindAsync(id);
+        if (visit == null)
+        {
+        return false;
+        }
+        _context.FarmVisits.Remove(visit);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
 }

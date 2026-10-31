@@ -51,4 +51,20 @@ public class FarmVisitsController : ControllerBase
         var result = await _service.GetAllAsync(farmerId, status, startDate, endDate, page, pageSize);
         return result;
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, FarmVisitRequest request)
+    {
+        var updated = await _service.UpdateAsync(id, request);
+        if (!updated) return NotFound();
+        return NoContent();
+        }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var deleted = await _service.DeleteAsync(id);
+        if (!deleted) return NotFound();
+        return NoContent();
+    }
+
 }
