@@ -32,6 +32,7 @@ public class FarmVisitService
     /* İstemciden gelen bilgilerle yeni ziyaret oluşturur. Çiftçi bulunamazsa null, aksi halde oluşan kaydı FarmVisitDto olarak döndürür. */
     public async Task<FarmVisitDto?> CreateAsync(FarmVisitRequest request)
     {
+        VisitRules.Validate(request);
         var farmer = await _context.Farmers.FindAsync(request.FarmerId);
         if (farmer == null)
         {
@@ -108,8 +109,10 @@ public class FarmVisitService
                 
         }
 
+    
     public async Task<bool> UpdateAsync(int id, FarmVisitRequest request)
     {
+        VisitRules.Validate(request);
         var visit = await _context.FarmVisits.FindAsync(id);
         if (visit == null)
         {
