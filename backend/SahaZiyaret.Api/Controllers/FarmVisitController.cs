@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SahaZiyaret.Api.Dtos;
 using SahaZiyaret.Api.Services;
 using SahaZiyaret.Api.Domain.Enums;
+using SahaZiyaret.Api.Exceptions;
 
 namespace SahaZiyaret.Api.Controllers;
 
@@ -35,10 +36,6 @@ public class FarmVisitsController : ControllerBase
     public async Task<ActionResult<FarmVisitDto>> Create(FarmVisitRequest request)
     {
         var created = await _service.CreateAsync(request);
-        if (created == null)
-        {
-            return BadRequest("Belirtilen çiftçi bulunamadı.");
-        }
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 

@@ -58,4 +58,13 @@ public class FarmersController : ControllerBase//ControllerBase, HTTP cevabı ü
         }
         return NoContent();
     }
+
+    /* DELETE api/Farmers/{id}: Çiftçiyi siler. Başarılıysa 204, kayıt yoksa 404, ziyaret kaydı varsa 400 döner. */
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var deleted = await _service.DeleteAsync(id);
+        if (!deleted) return NotFound();
+        return NoContent();
+    }
 }

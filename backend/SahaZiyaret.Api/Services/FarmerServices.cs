@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SahaZiyaret.Api.Data;
 using SahaZiyaret.Api.Domain.Entities;
 using SahaZiyaret.Api.Dtos;
+using SahaZiyaret.Api.Exceptions;
 
 namespace SahaZiyaret.Api.Services;
 
@@ -101,6 +102,26 @@ public class FarmerService
         farmer.Region = request.Region;
         farmer.District = request.District;
 
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    /* Verilen Id’deki çiftçiyi siler. Çiftçinin ziyaret kaydı varsa BusinessRuleException fırlatır. Çiftçi bulunamazsa false döndürür. */
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var farmer = await _context.Farmers.FindAsync(id);
+        if (farmer == null)
+        {
+            return false;
+        }
+
+        var hasVisits = await _context.FarmVisits.AnyAsync(v => v.FarmerId == id);
+        if (hasVisits)
+        {
+            throw new BusinessRuleException("Ziyaret kaydı bulunan çiftçi silinemez.");
+        }
+
+        _context.Farmers.Remove(farmer);
         await _context.SaveChangesAsync();
         return true;
     }
