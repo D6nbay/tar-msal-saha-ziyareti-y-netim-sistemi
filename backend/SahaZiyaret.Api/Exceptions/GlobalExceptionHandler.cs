@@ -1,27 +1,47 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SahaZiyaret.Api.Exceptions;
 
-/* BusinessRuleExceptionı yakalayıp 400 ve açıklayıcı mesajla döndürür.*/
+/* Doğrulama ve iş kuralı hatalarını yakalayıp 400 ile döndürür.*/
 public class GlobalExceptionHandler : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        if (exception is not BusinessRuleException)
+        if (exception is ValidationException validationException)
         {
-            return false;
+            var errors = validationException.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(
+                    g => char.ToLowerInvariant(g.Key[0]) + g.Key.Substring(1),
+                    g => g.Select(e => e.ErrorMessage).ToArray());
+            // Alan adının ilk harfini küçült
+
+            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await httpContext.Response.WriteAsJsonAsync(new ValidationProblemDetails(errors)
+            {
+                Status = 400,
+                Title = "Doğrulama hatası"
+            }, cancellationToken);
+            return true;
         }
 
-        httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-        await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
+        // Kendi iş kuralı hatalarım
+        if (exception is BusinessRuleException)
         {
-            Status = 400,
-            Title = "İş kuralı ihlali",
-            Detail = exception.Message
-        }, cancellationToken);
+            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
+            {
+                Status = 400,
+                Title = "İş kuralı ihlali",
+                Detail = exception.Message
+            }, cancellationToken);
+            return true;
+        }
 
-        return true;
+        //Başka hata
+        return false;
     }
 }

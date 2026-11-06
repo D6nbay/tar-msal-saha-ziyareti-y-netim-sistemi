@@ -31,7 +31,7 @@ public class FarmVisitsController : ControllerBase
         return visit;
     }
 
-    /* POST api/farm-visits: Yeni ziyaret oluşturur. Çiftçi yoksa 400, başarılıysa 201 Created ve oluşan kaydı döner. */
+    /* POST api/farm-visits: Yeni ziyaret oluşturur. Hata varsa 400, başarılıysa 201 Created ve oluşan kaydı döner. */
     [HttpPost]
     public async Task<ActionResult<FarmVisitDto>> Create(FarmVisitRequest request)
     {

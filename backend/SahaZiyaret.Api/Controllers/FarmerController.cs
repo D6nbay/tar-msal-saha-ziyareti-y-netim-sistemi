@@ -64,7 +64,10 @@ public class FarmersController : ControllerBase//ControllerBase, HTTP cevabı ü
     public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _service.DeleteAsync(id);
-        if (!deleted) return NotFound();
+        if (!deleted)
+        {
+            return NotFound();
+        }
         return NoContent();
     }
 }
