@@ -26,14 +26,16 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
-// Uygulama açılırken bekleyen migration'ları uygular ve veritabanı boşsa örnek veri ekler
-using (var scope = app.Services.CreateScope())
+// Test ortamında gerçek veritabanına gitmiyoruz, bu yüzden migration ve seed'i atlarız
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    var db = scope.ServiceProvider.GetRequiredService<SahaZiyaretDbContext>();
-
-    await db.Database.MigrateAsync();
-
-    await Seed.SeedAsync(db);
+    // Uygulama açılırken bekleyen migration'ları uygular ve veritabanı boşsa örnek veri ekler
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<SahaZiyaretDbContext>();
+        await db.Database.MigrateAsync();
+        await Seed.SeedAsync(db);
+    }
 }
 app.UseExceptionHandler();
 
@@ -51,3 +53,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Test projesinin uygulamayı başlatabilmesi için Program sınıfını erişilebilir yapar
+public partial class Program { }
