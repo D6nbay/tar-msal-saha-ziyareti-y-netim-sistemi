@@ -190,14 +190,14 @@ public class FarmVisitService
     }
 
     /* FarmVisit sınıfını istemciye dönecek FarmVisitDto'ya çevirir. */
-    private static FarmVisitDto ToDto(FarmVisit visit)
+    public static FarmVisitDto ToDto(FarmVisit visit)
     {
         return new FarmVisitDto
         {
             Id = visit.Id,
             FarmerId = visit.FarmerId,
             FarmerName = visit.Farmer.FullName,
-            // Farmer'ın dolu olması için sorgularda Include kullan
+            // Farmer'ın dolu olması için sorgularda Include kullanılır
             VisitDate = visit.VisitDate,
             VisitType = visit.VisitType,
             Notes = visit.Notes,

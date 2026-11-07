@@ -19,12 +19,22 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<SahaZiyaretDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<FarmerService>();
+builder.Services.AddScoped<DashboardService>();
 builder.Services.AddValidatorsFromAssemblyContaining<FarmerRequestValidator>();
 builder.Services.AddScoped<FarmVisitService>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+// Uygulama açılırken bekleyen migration'ları uygular ve veritabanı boşsa örnek veri ekler
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<SahaZiyaretDbContext>();
+
+    await db.Database.MigrateAsync();
+
+    await Seed.SeedAsync(db);
+}
 app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
